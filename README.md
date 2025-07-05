@@ -6,7 +6,7 @@ A simple Node.js + TypeScript + Express backend with PostgreSQL and Prisma ORM.
 
 ## Prerequisites
 
-- **Node.js** ≥ 14 & **npm**
+- **Node.js** ≥ 18 & **npm**
 - **Docker** & **Docker Compose** (for PostgreSQL)
 - **Git** (optional)
 
@@ -15,8 +15,8 @@ A simple Node.js + TypeScript + Express backend with PostgreSQL and Prisma ORM.
 1. Clone the repo
 
    ```bash
-   git clone https://github.com/yourusername/my-backend.git
-   cd my-backend
+   git clone https://github.com/farxmai/homebrew-back.git
+   cd homebrew-back
    ```
 
 2. Install dependencies
@@ -30,17 +30,17 @@ Create a file named `.env` in the project root with these values:
 
 ```dotenv
 # PostgreSQL (for Prisma)
-DATABASE_URL="postgresql://myuser:mypassword@localhost:5432/mydb?schema=public"
+DATABASE_URL="postgresql://myuser:mypassword@localhost:5432/homebrewDB?schema=public"
 
 # (Optional) if your code reads these separately
 DB_HOST=localhost
 DB_PORT=5432
-DB_NAME=mydb
+DB_NAME=homebrewDB
 DB_USER=myuser
 DB_PASS=mypassword
 
 # Express server port
-PORT=3000
+PORT=3001
 ```
 
 ## Database Setup
@@ -103,7 +103,7 @@ docker-compose ps
 ## Project Structure
 
 ```
-my-backend/
+homebrew-back/
 ├─ prisma/
 │  └─ schema.prisma
 ├─ src/
@@ -111,7 +111,8 @@ my-backend/
 │  ├─ prisma.ts
 │  └─ routes/
 │     ├─ users.ts
-│     └─ posts.ts
+│     └─ characters.ts
+│     ...
 ├─ .env
 ├─ docker-compose.yml
 └─ package.json
@@ -119,4 +120,4 @@ my-backend/
 
 ## License
 
-MIT © Your Name
+MIT © Farxmai
