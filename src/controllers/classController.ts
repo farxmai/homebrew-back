@@ -39,10 +39,8 @@ export const getClassById = async (
   res: Response,
   next: NextFunction
 ): Promise<any> => {
-  const classId = parseInt(req.params.id, 10);
-  if (isNaN(classId)) {
-    return res.status(400).json({ error: "Invalid class ID" });
-  }
+  const classId = Number(req.params.id);
+
   try {
     const characterClass = await prisma.characterClass.findUnique({
       where: { id: classId },
@@ -147,9 +145,6 @@ export const updateClass = async (
   next: NextFunction
 ): Promise<any> => {
   const classId = Number(req.params.id);
-  if (isNaN(classId)) {
-    return res.status(400).json({ error: "Invalid class ID" });
-  }
 
   try {
     const classData = req.body as ReqBodyClass;

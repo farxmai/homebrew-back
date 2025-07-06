@@ -5,9 +5,8 @@ import dotenv from "dotenv";
 import charactersRouter from "./routes/characters";
 import skillsRouter from "./routes/skills";
 import classesRouter from "./routes/classes";
-// import featsRouter from './routes/feats';
-// import itemsRouter from './routes/items';
-// import languagesRouter from './routes/languages';
+import featsRouter from "./routes/feats";
+import racesRouter from "./routes/races";
 
 // Load environment variables from .env
 dotenv.config();
@@ -26,9 +25,8 @@ app.get("/", (_req: Request, res: Response<HealthCheck>) => {
 app.use("/characters", charactersRouter);
 app.use("/skills", skillsRouter);
 app.use("/classes", classesRouter);
-// app.use('/feats', featsRouter);
-// app.use('/items', itemsRouter);
-// app.use('/languages', languagesRouter);
+app.use("/feats", featsRouter);
+app.use("/races", racesRouter);
 
 // Global error handler
 app.use((err: any, _req: Request, res: Response, next: NextFunction) => {

@@ -159,15 +159,16 @@ model CharacterRace {
   descriptionShort      String
   source                String
   speed                 Int
-  size                  String
+  size                  Int
+  stats                 StatsBase?         @relation(fields: [statsId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  statsId               Int?
   skillPointsFist       Int?
   skillPointsAfterFirst Int?
   skillBonuses          RaceOnSkillBonus[]
-  stats                 StatsBase?         @relation(fields: [statsId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  statsId               Int?
   languages             RaceOnLanguage[]
+  feats                 RaceOnFeat[]
+  // not important
   relatedCharacters     CharacterOnRace[]
-  relatedFeats          RaceOnFeat[]
 }
 
 model RaceOnSkillBonus {
