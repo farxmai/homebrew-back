@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import prisma from "../prisma";
 import { ReqBodyFeat } from "../types/reqBodies";
+import { buildRequirement, buildStatsBase } from "../utils/requestBuilders";
 
 export const getFeats = async (
   req: Request,
@@ -10,13 +11,16 @@ export const getFeats = async (
   try {
     const feats = await prisma.feat.findMany({
       include: {
-        stats: true,
-        skillBonuses: {
+        stats: {
           include: {
-            skill: true,
+            skillBonuses: {
+              include: {
+                skill: true,
+              },
+            },
           },
         },
-        requirements: {
+        requirement: {
           include: {
             skills: {
               select: {
@@ -62,13 +66,16 @@ export const getFeatById = async (
     const feat = await prisma.feat.findUnique({
       where: { id: featId },
       include: {
-        stats: true,
-        skillBonuses: {
+        stats: {
           include: {
-            skill: true,
+            skillBonuses: {
+              include: {
+                skill: true,
+              },
+            },
           },
         },
-        requirements: {
+        requirement: {
           include: {
             skills: {
               select: {
@@ -121,41 +128,8 @@ export const createFeat = async (
         isPassive: featData.isPassive || false,
         isFighterBonusFeat: featData.isFighterBonusFeat || false,
         isStackable: featData.isStackable || false,
-        ...(featData.stats && { stats: { create: featData.stats } }),
-        ...(featData.skillBonuses && {
-          skillBonuses: { create: featData.skillBonuses },
-        }),
-        ...(featData.requirements && {
-          requirements: {
-            create: featData.requirements.map((requirement) => ({
-              str: requirement.str,
-              dex: requirement.dex,
-              con: requirement.con,
-              int: requirement.int,
-              wis: requirement.wis,
-              cha: requirement.cha,
-              minBaseAttack: requirement.minBaseAttack,
-              minClassLevel: requirement.minClassLevel,
-              classId: requirement.classId,
-              other: requirement.other,
-              casterOnly: requirement.casterOnly,
-              divineOnly: requirement.divineOnly,
-              skills: {
-                create:
-                  requirement.skills?.map((skill) => ({
-                    skillId: skill.skillId,
-                    minRank: skill.minRank || 0,
-                  })) || [],
-              },
-              feats: {
-                create:
-                  requirement.feats?.map((featReq) => ({
-                    feat: { connect: { id: featReq.featRequirementId } },
-                  })) || [],
-              },
-            })),
-          },
-        }),
+        ...buildStatsBase("create", featData.stats),
+        ...buildRequirement("create", featData.requirement),
       },
     });
     res.json(feat);
@@ -187,42 +161,8 @@ export const updateFeat = async (
         isPassive: featData.isPassive || false,
         isFighterBonusFeat: featData.isFighterBonusFeat || false,
         isStackable: featData.isStackable || false,
-        ...(featData.stats && { stats: { update: featData.stats } }),
-        ...(featData.skillBonuses && {
-          skillBonuses: { deleteMany: {}, create: featData.skillBonuses },
-        }),
-        ...(featData.requirements && {
-          requirements: {
-            deleteMany: {},
-            create: featData.requirements.map((requirement) => ({
-              str: requirement.str,
-              dex: requirement.dex,
-              con: requirement.con,
-              int: requirement.int,
-              wis: requirement.wis,
-              cha: requirement.cha,
-              minBaseAttack: requirement.minBaseAttack,
-              minClassLevel: requirement.minClassLevel,
-              classId: requirement.classId,
-              other: requirement.other,
-              casterOnly: requirement.casterOnly,
-              divineOnly: requirement.divineOnly,
-              skills: {
-                create:
-                  requirement.skills?.map((skill) => ({
-                    skillId: skill.skillId,
-                    minRank: skill.minRank || 0,
-                  })) || [],
-              },
-              feats: {
-                create:
-                  requirement.feats?.map((featReq) => ({
-                    feat: { connect: { id: featReq.featRequirementId } },
-                  })) || [],
-              },
-            })),
-          },
-        }),
+        ...buildStatsBase("update", featData.stats),
+        ...buildRequirement("update", featData.requirement),
       },
     });
     res.json(feat);

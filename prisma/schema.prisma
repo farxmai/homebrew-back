@@ -15,57 +15,84 @@ datasource db {
 
 // StatsBase - This model is used to store the base stats, that can be used for buffs, bonuses, enchantments etc.
 model StatsBase {
-  id                   Int             @id @default(autoincrement())
-  strength             Int?
-  dexterity            Int?
-  constitution         Int?
-  intelligence         Int?
-  wisdom               Int?
-  charisma             Int?
-  fortitude            Int?
-  reflex               Int?
-  will                 Int?
-  speedBonus           Int?
-  speedMax             Int?
-  speedMod             Int?
-  size                 Int?
+  id  Int  @id @default(autoincrement())
+  str Int?
+  dex Int?
+  con Int?
+  int Int?
+  wis Int?
+  cha Int?
+
+  fortitude Int?
+  reflex    Int?
+  will      Int?
+
+  speedBonus Int?
+  speedMax   Int?
+  speedMod   Int?
+  size       Int?
+
   acArmor              Int?
   acShield             Int?
   acNatural            Int?
   acDeflection         Int?
+  acAgainstMissiles    Int?
   acMisc               Int?
   acDexterityAvailable Boolean?
   acDexterityMax       Int?
   skillPenalty         Int?
-  attackMelee          Int?
-  attackRanged         Int?
-  attackTouch          Int?
-  attackGrapple        Int?
-  damageMelee          Int?
-  damageRanged         Int?
-  hpTemp               Int?
-  resistSpell          Int?
-  resistPsionic        Int?
-  resistAcid           Int?
-  resistCold           Int?
-  resistElectricity    Int?
-  resistFire           Int?
-  resistSonic          Int?
-  resistForce          Int?
-  resistNegativeEnergy Int?
-  resistPositiveEnergy Int?
-  resistPoison         Int?
-  resistDisease        Int?
-  resistDeathEffect    Int?
-  resistBlunt          Int?
-  resistPiercing       Int?
-  resistSlashing       Int?
-  resistGood           Int?
-  resistEvil           Int?
-  resistLawful         Int?
-  resistChaotic        Int?
-  relatedRaces         CharacterRace[]
-  relatedFeats         Feat[]
+
+  attackMelee   Int?
+  attackRanged  Int?
+  attackTouch   Int?
+  attackGrapple Int?
+  damageMelee   Int?
+  damageRanged  Int?
+  hpTemp        Int?
+  // TODO: weapon specific bonuses
+
+  damageReduction         Int? // Damage reduction is a value that reduces incoming damage, e.g. DR 5/adamantine
+  damageReductionBypasses String? // Damage reduction bypasses, e.g. "adamantine", "silver", etc.
+  resistCritChance        Int? // Resistance to critical hits, e.g. 50% means half of the critical hits are negated
+
+  energyResistAcid        Int?
+  energyResistCold        Int?
+  energyResistElectricity Int?
+  energyResistFire        Int?
+  energyResistSonic       Int?
+  energyResistForce       Int?
+  energyResistNegative    Int?
+  energyResistPositive    Int?
+
+  poisonResistance        Int? // Resistance to poison, e.g. bonus on saves vs. poison
+  charmResistance         Int? // Resistance to charm effects, e.g. bonus on saves vs. charm
+  fearResistance          Int? // Resistance to disease, e.g. bonus on saves vs.
+  sleepResistance         Int? // Resistance to sleep effects, e.g. bonus on saves vs. sleep
+  diseaseResistance       Int? // Resistance to disease, e.g. bonus on saves vs. disease
+  mindAffectingResistance Int? // Resistance to mind-affecting effects, e.g. bonus on saves vs. mind-affecting
+  deathResistance         Int? // Resistance to death effects, e.g. bonus on saves vs. death
+  paralysisResistance     Int? // Resistance to paralysis, e.g. bonus on saves vs. paralysis
+  fatigueResistance       Int? // Resistance to fatigue, e.g. bonus on saves vs. fatigue
+
+  spellResistance     Int? // Acts like AC against spells. A caster must roll 1d20 + caster level vs. the creature’s SR to affect it.
+  psionicResistance   Int?
+  casterLevelModifier Int? // Caster level modifier, e.g. +2 to caster level for spells
+
+  skillBonuses SkillBonusOnStatsBase[]
+
+  // CONNECTIONS
+  relatedRaces CharacterRace[]
+  relatedFeats Feat[]
+}
+
+model SkillBonusOnStatsBase {
+  stats   StatsBase @relation(fields: [statsId], references: [id])
+  statsId Int
+  skill   SkillBase @relation(fields: [skillId], references: [id])
+  skillId Int
+  bonus   Int
+
+  @@id([statsId, skillId])
 }
 
 model Language {
@@ -153,32 +180,21 @@ model CharacterOnRace {
 }
 
 model CharacterRace {
-  id                    Int                @id @default(autoincrement())
-  name                  String             @unique
+  id                    Int               @id @default(autoincrement())
+  name                  String            @unique
   description           String
   descriptionShort      String
   source                String
   speed                 Int
   size                  Int
-  stats                 StatsBase?         @relation(fields: [statsId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  stats                 StatsBase?        @relation(fields: [statsId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   statsId               Int?
   skillPointsFist       Int?
   skillPointsAfterFirst Int?
-  skillBonuses          RaceOnSkillBonus[]
   languages             RaceOnLanguage[]
   feats                 RaceOnFeat[]
   // not important
   relatedCharacters     CharacterOnRace[]
-}
-
-model RaceOnSkillBonus {
-  characterRace   CharacterRace @relation(fields: [characterRaceId], references: [id])
-  characterRaceId Int
-  skill           SkillBase     @relation(fields: [skillId], references: [id])
-  skillId         Int
-  bonus           Int
-
-  @@id([characterRaceId, skillId])
 }
 
 model RaceOnLanguage {
@@ -248,19 +264,19 @@ model CharacterOnClass {
 }
 
 model CharacterClass {
-  id                      Int                     @id @default(autoincrement())
-  name                    String                  @unique
-  description             String
-  descriptionShort        String
-  source                  String
-  hitDice                 Int
-  skillPointsFist         Int
-  skillPointsAfterFirst   Int
-  baseAttribute           String
-  classLevelBonuses       ClassLvlBonus[] // ← all class level bonuses PER LEVEL, like base attack, saves, spell points, etc.
-  classSkills             CharacterClassOnSkill[] // ← simple relation to skills that could maximize 
-  relatedCharacters       CharacterOnClass[] // ← all characters that have this class
-  relatedFeatRequirements FeatRequirement[]
+  id                    Int                     @id @default(autoincrement())
+  name                  String                  @unique
+  description           String
+  descriptionShort      String
+  source                String
+  hitDice               Int
+  skillPointsFist       Int
+  skillPointsAfterFirst Int
+  baseAttribute         String
+  classLevelBonuses     ClassLvlBonus[] // ← all class level bonuses PER LEVEL, like base attack, saves, spell points, etc.
+  classSkills           CharacterClassOnSkill[] // ← simple relation to skills that could maximize 
+  relatedCharacters     CharacterOnClass[] // ← all characters that have this class
+  relatedRequirements   Requirement[]
 }
 
 model CharacterClassOnSkill {
@@ -273,19 +289,20 @@ model CharacterClassOnSkill {
 }
 
 model SkillBase {
-  id                     Int                      @id @default(autoincrement())
-  name                   String                   @unique
-  description            String
-  descriptionShort       String
-  source                 String
-  ability                String
-  trainedOnly            Boolean
-  armorCheckPenalty      Int
-  characterSkills        CharacterSkill[] // ← all characters that have this skill
-  FeatRequirementOnSkill FeatRequirementOnSkill[]
-  FeatsOnSkillBonus      FeatsOnSkillBonus[]
-  CharacterClassOnSkill  CharacterClassOnSkill[]
-  RaceOnSkillBonus       RaceOnSkillBonus[]
+  id                Int     @id @default(autoincrement())
+  name              String  @unique
+  description       String
+  descriptionShort  String
+  source            String
+  ability           String
+  trainedOnly       Boolean
+  armorCheckPenalty Int
+
+  // CONNECTIONS
+  relateCharacters    CharacterSkill[] // ← all characters that have this skill
+  relatedRequirements RequirementOnSkill[]
+  relateClasses       CharacterClassOnSkill[]
+  relateSkillBonuses  SkillBonusOnStatsBase[]
 }
 
 model CharacterSkill {
@@ -311,12 +328,13 @@ model Feat {
   isStackable            Boolean
   stats                  StatsBase?               @relation(fields: [statsId], references: [id])
   statsId                Int?
-  skillBonuses           FeatsOnSkillBonus[]
-  requirements           FeatRequirement[]
+  requirement            Requirement?             @relation(fields: [featRequirementId], references: [id])
+  requirementId          Int?
   // not important
-  relatedFeatRequirement FeatRequirementOnFeat[]
+  relatedRequirement     RequirementOnFeat[]
   relatedClassLevelBonus FeatsOnClassLevelBonus[]
   relatedRaces           RaceOnFeat[]
+  featRequirementId      Int?
 }
 
 model FeatsOnClassLevelBonus {
@@ -328,20 +346,9 @@ model FeatsOnClassLevelBonus {
   @@id([featId, classLevelBonusId])
 }
 
-model FeatsOnSkillBonus {
-  feat    Feat      @relation(fields: [featId], references: [id])
-  featId  Int
-  skill   SkillBase @relation(fields: [skillId], references: [id])
-  skillId Int
-  bonus   Int
+model Requirement {
+  id Int @id @default(autoincrement())
 
-  @@id([featId, skillId])
-}
-
-model FeatRequirement {
-  id            Int                      @id @default(autoincrement())
-  feat          Feat                     @relation(fields: [featId], references: [id])
-  featId        Int
   str           Int?
   dex           Int?
   con           Int?
@@ -353,29 +360,29 @@ model FeatRequirement {
   casterOnly    Boolean?
   divineOnly    Boolean?
   minClassLevel Int?
-  class         CharacterClass?          @relation(fields: [classId], references: [id])
+  class         CharacterClass?      @relation(fields: [classId], references: [id])
   classId       Int?
-  skills        FeatRequirementOnSkill[]
-  feats         FeatRequirementOnFeat[]
-
-  @@index([featId])
+  skills        RequirementOnSkill[]
+  feats         RequirementOnFeat[]
+  // CONNECTIONS
+  relatedFeats  Feat[]
 }
 
-model FeatRequirementOnFeat {
-  featRequirement   FeatRequirement @relation(fields: [featRequirementId], references: [id])
-  featRequirementId Int
-  feat              Feat            @relation(fields: [featId], references: [id])
-  featId            Int
+model RequirementOnFeat {
+  requirement   Requirement @relation(fields: [requirementId], references: [id])
+  requirementId Int
+  feat          Feat        @relation(fields: [featId], references: [id])
+  featId        Int
 
-  @@id([featRequirementId, featId])
+  @@id([requirementId, featId])
 }
 
-model FeatRequirementOnSkill {
-  feat    FeatRequirement @relation(fields: [featId], references: [id])
-  featId  Int
-  skill   SkillBase       @relation(fields: [skillId], references: [id])
-  skillId Int
-  minRank Int
+model RequirementOnSkill {
+  requirement   Requirement @relation(fields: [requirementId], references: [id])
+  requirementId Int
+  skill         SkillBase   @relation(fields: [skillId], references: [id])
+  skillId       Int
+  minRank       Int
 
-  @@id([featId, skillId])
+  @@id([requirementId, skillId])
 }

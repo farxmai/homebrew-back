@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import prisma from "../prisma";
 import { ReqBodyRace } from "../types/reqBodies";
+import { buildStatsBase } from "../utils/requestBuilders";
 
 export const getRaces = async (
   req: Request,
@@ -26,13 +27,11 @@ export const getRaceById = async (
     const characterRace = await prisma.characterRace.findUnique({
       where: { id: raceId },
       include: {
-        stats: true,
-        skillBonuses: {
+        stats: {
           include: {
-            skill: {
-              select: {
-                id: true,
-                name: true,
+            skillBonuses: {
+              include: {
+                skill: true,
               },
             },
           },
@@ -79,21 +78,18 @@ export const createRace = async (
     const newRace = await prisma.characterRace.create({
       data: {
         name: raceData.name,
-        description: raceData.description || "",
+        description: raceData.description,
         descriptionShort: raceData.descriptionShort || "",
         source: raceData.source || "Players Handbook 1",
         speed: raceData.speed || 0,
         size: raceData.size || 0,
-        ...(raceData.stats && { stats: { create: raceData.stats } }),
+        ...buildStatsBase("create", raceData.stats),
         ...(raceData.skillPointsFist && {
           skillPointsFist: raceData.skillPointsFist,
         }),
         ...(raceData.skillPointsAfterFirst && {
           skillPointsAfterFirst: raceData.skillPointsAfterFirst,
         }),
-        skillBonuses: {
-          create: raceData.skillBonuses || [],
-        },
         languages: {
           create:
             raceData.languages?.map((lang) => ({
@@ -127,22 +123,14 @@ export const updateRace = async (
       where: { id: raceId },
       data: {
         name: raceData.name,
-        description: raceData.description || "",
-        descriptionShort: raceData.descriptionShort || "",
+        description: raceData.description,
+        descriptionShort: raceData.descriptionShort,
         source: raceData.source || "Players Handbook 1",
-        speed: raceData.speed || 0,
-        size: raceData.size || 0,
-        ...(raceData.stats && { stats: { update: raceData.stats } }),
-        ...(raceData.skillPointsFist && {
-          skillPointsFist: raceData.skillPointsFist,
-        }),
-        ...(raceData.skillPointsAfterFirst && {
-          skillPointsAfterFirst: raceData.skillPointsAfterFirst,
-        }),
-        skillBonuses: {
-          deleteMany: {}, // Clear existing
-          create: raceData.skillBonuses || [],
-        },
+        speed: raceData.speed,
+        size: raceData.size,
+        skillPointsFist: raceData.skillPointsFist,
+        skillPointsAfterFirst: raceData.skillPointsAfterFirst,
+        ...buildStatsBase("update", raceData.stats),
         languages: {
           deleteMany: {}, // Clear existing
           create:

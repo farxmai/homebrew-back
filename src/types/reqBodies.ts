@@ -26,6 +26,13 @@ export interface ReqBodyRace {
   // }[]
 }
 
+export interface ReqBodyLangue {
+  id?: number;
+  name: string;
+  description?: string;
+  source?: string;
+}
+
 export interface ReqBodyClass {
   id?: number;
   name: string;
@@ -60,6 +67,29 @@ export interface ReqBodyClass {
   }[];
 }
 
+export interface ReqBodyRequirement {
+  id?: number;
+  str?: number;
+  dex?: number;
+  con?: number;
+  int?: number;
+  wis?: number;
+  cha?: number;
+  minBaseAttack?: number;
+  minClassLevel?: number;
+  classId?: number;
+  other?: string;
+  casterOnly?: boolean;
+  divineOnly?: boolean;
+  skills?: {
+    skillId: number;
+    minRank?: number;
+  }[];
+  feats?: {
+    featRequirementId: number;
+  }[];
+}
+
 export interface ReqBodyFeat {
   id?: number;
   name: string;
@@ -72,31 +102,7 @@ export interface ReqBodyFeat {
   isStackable?: boolean;
   stats?: ReqBodyStatsBase;
   statsId?: number;
-  skillBonuses?: {
-    skillId: number;
-    bonus: number;
-  }[];
-  requirements?: {
-    str?: number;
-    dex?: number;
-    con?: number;
-    int?: number;
-    wis?: number;
-    cha?: number;
-    minBaseAttack?: number;
-    minClassLevel?: number;
-    classId?: number;
-    other?: string;
-    casterOnly?: boolean;
-    divineOnly?: boolean;
-    skills?: {
-      skillId: number;
-      minRank?: number;
-    }[];
-    feats?: {
-      featRequirementId: number;
-    }[];
-  }[];
+  requirement?: ReqBodyRequirement;
 }
 
 export interface ReqBodySkill {
@@ -111,19 +117,24 @@ export interface ReqBodySkill {
 }
 
 export interface ReqBodyStatsBase {
-  strength?: number;
-  dexterity?: number;
-  constitution?: number;
-  intelligence?: number;
-  wisdom?: number;
-  charisma?: number;
+  // Base stats
+  str?: number;
+  dex?: number;
+  con?: number;
+  int?: number;
+  wis?: number;
+  cha?: number;
   fortitude?: number;
   reflex?: number;
   will?: number;
+
+  // Body stats
   speedBonus?: number;
   speedMax?: number;
   speedMod?: number;
   size?: number;
+
+  // Armor stats
   acArmor?: number;
   acShield?: number;
   acNatural?: number;
@@ -132,6 +143,8 @@ export interface ReqBodyStatsBase {
   acDexterityAvailable?: boolean;
   acDexterityMax?: number;
   skillPenalty?: number;
+
+  // Attack and damage stats
   attackMelee?: number;
   attackRanged?: number;
   attackTouch?: number;
@@ -139,24 +152,41 @@ export interface ReqBodyStatsBase {
   damageMelee?: number;
   damageRanged?: number;
   hpTemp?: number;
-  resistSpell?: number;
-  resistPsionic?: number;
-  resistAcid?: number;
-  resistCold?: number;
-  resistElectricity?: number;
-  resistFire?: number;
-  resistSonic?: number;
-  resistForce?: number;
-  resistNegativeEnergy?: number;
-  resistPositiveEnergy?: number;
-  resistPoison?: number;
-  resistDisease?: number;
-  resistDeathEffect?: number;
-  resistBlunt?: number;
-  resistPiercing?: number;
-  resistSlashing?: number;
-  resistGood?: number;
-  resistEvil?: number;
-  resistLawful?: number;
-  resistChaotic?: number;
+  // TODO: weapon specific bonuses
+
+  // Defense stats
+  damageReduction?: number;
+  damageReductionBypasses?: string; // e.g., "slashing", "piercing", "bludgeoning"
+  resistCritChance?: number; // percentage chance to resist critical hits
+
+  // Energy resistances (99 = immune)
+  energyResistAcid?: number;
+  energyResistCold?: number;
+  energyResistElectricity?: number;
+  energyResistFire?: number;
+  energyResistSonic?: number;
+  energyResistForce?: number;
+  energyResistNegative?: number;
+  energyResistPositive?: number;
+
+  // Saves specific bonuses (99 = immune)
+  poisonResistance?: number;
+  charmResistance?: number;
+  fearResistance?: number;
+  sleepResistance?: number;
+  diseaseResistance?: number;
+  mindAffectingResistance?: number;
+  deathResistance?: number;
+  paralysisResistance?: number;
+  fatigueResistance?: number;
+
+  // Spell
+  spellResistance?: number;
+  psionicResistance?: number;
+  casterLevelModifier?: number;
+
+  skillBonuses?: {
+    skillId: number;
+    bonus: number;
+  }[];
 }
