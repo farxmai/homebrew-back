@@ -1,0 +1,57 @@
+/*
+  Warnings:
+
+  - Added the required column `level` to the `CharacterOnClass` table without a default value. This is not possible if the table is not empty.
+
+*/
+-- AlterTable
+ALTER TABLE "CharacterOnClass" ADD COLUMN     "level" INTEGER NOT NULL;
+
+-- AlterTable
+ALTER TABLE "StatsBase" ALTER COLUMN "strength" DROP NOT NULL,
+ALTER COLUMN "dexterity" DROP NOT NULL,
+ALTER COLUMN "constitution" DROP NOT NULL,
+ALTER COLUMN "intelligence" DROP NOT NULL,
+ALTER COLUMN "wisdom" DROP NOT NULL,
+ALTER COLUMN "charisma" DROP NOT NULL,
+ALTER COLUMN "fortitude" DROP NOT NULL,
+ALTER COLUMN "reflex" DROP NOT NULL,
+ALTER COLUMN "will" DROP NOT NULL,
+ALTER COLUMN "speedBonus" DROP NOT NULL,
+ALTER COLUMN "speedMax" DROP NOT NULL,
+ALTER COLUMN "speedMod" DROP NOT NULL,
+ALTER COLUMN "size" DROP NOT NULL,
+ALTER COLUMN "acArmor" DROP NOT NULL,
+ALTER COLUMN "acShield" DROP NOT NULL,
+ALTER COLUMN "acNatural" DROP NOT NULL,
+ALTER COLUMN "acDeflection" DROP NOT NULL,
+ALTER COLUMN "acMisc" DROP NOT NULL,
+ALTER COLUMN "acDexterityMax" DROP NOT NULL,
+ALTER COLUMN "skillPenalty" DROP NOT NULL,
+ALTER COLUMN "attackMelee" DROP NOT NULL,
+ALTER COLUMN "attackRanged" DROP NOT NULL,
+ALTER COLUMN "attackTouch" DROP NOT NULL,
+ALTER COLUMN "attackGrapple" DROP NOT NULL,
+ALTER COLUMN "damageMelee" DROP NOT NULL,
+ALTER COLUMN "damageRanged" DROP NOT NULL,
+ALTER COLUMN "hpTemp" DROP NOT NULL,
+ALTER COLUMN "resistSpell" DROP NOT NULL,
+ALTER COLUMN "resistPsionic" DROP NOT NULL,
+ALTER COLUMN "resistAcid" DROP NOT NULL,
+ALTER COLUMN "resistCold" DROP NOT NULL,
+ALTER COLUMN "resistElectricity" DROP NOT NULL,
+ALTER COLUMN "resistFire" DROP NOT NULL,
+ALTER COLUMN "resistSonic" DROP NOT NULL,
+ALTER COLUMN "resistForce" DROP NOT NULL,
+ALTER COLUMN "resistNegativeEnergy" DROP NOT NULL,
+ALTER COLUMN "resistPositiveEnergy" DROP NOT NULL,
+ALTER COLUMN "resistPoison" DROP NOT NULL,
+ALTER COLUMN "resistDisease" DROP NOT NULL,
+ALTER COLUMN "resistDeathEffect" DROP NOT NULL,
+ALTER COLUMN "resistBlunt" DROP NOT NULL,
+ALTER COLUMN "resistPiercing" DROP NOT NULL,
+ALTER COLUMN "resistSlashing" DROP NOT NULL,
+ALTER COLUMN "resistGood" DROP NOT NULL,
+ALTER COLUMN "resistEvil" DROP NOT NULL,
+ALTER COLUMN "resistLawful" DROP NOT NULL,
+ALTER COLUMN "resistChaotic" DROP NOT NULL;

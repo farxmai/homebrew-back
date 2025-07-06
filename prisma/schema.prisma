@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -17,72 +16,94 @@ datasource db {
 // StatsBase - This model is used to store the base stats, that can be used for buffs, bonuses, enchantments etc.
 model StatsBase {
   id                   Int             @id @default(autoincrement())
-  strength             Int
-  dexterity            Int
-  constitution         Int
-  intelligence         Int
-  wisdom               Int
-  charisma             Int
-  fortitude            Int
-  reflex               Int
-  will                 Int
-  speedBonus           Int
-  speedMax             Int
-  speedMod             Int
-  size                 Int
-  acArmor              Int
-  acShield             Int
-  acNatural            Int
-  acDeflection         Int
-  acMisc               Int
-  acDexterityAvailable Boolean
-  acDexterityMax       Int
-  skillPenalty         Int
-  attackMelee          Int
-  attackRanged         Int
-  attackTouch          Int
-  attackGrapple        Int
-  damageMelee          Int
-  damageRanged         Int
-  hpTemp               Int
-  resistSpell          Int
-  resistPsionic        Int
-  resistAcid           Int
-  resistCold           Int
-  resistElectricity    Int
-  resistFire           Int
-  resistSonic          Int
-  resistForce          Int
-  resistNegativeEnergy Int
-  resistPositiveEnergy Int
-  resistPoison         Int
-  resistDisease        Int
-  resistDeathEffect    Int
-  resistBlunt          Int
-  resistPiercing       Int
-  resistSlashing       Int
-  resistGood           Int
-  resistEvil           Int
-  resistLawful         Int
-  resistChaotic        Int
+  strength             Int?
+  dexterity            Int?
+  constitution         Int?
+  intelligence         Int?
+  wisdom               Int?
+  charisma             Int?
+  fortitude            Int?
+  reflex               Int?
+  will                 Int?
+  speedBonus           Int?
+  speedMax             Int?
+  speedMod             Int?
+  size                 Int?
+  acArmor              Int?
+  acShield             Int?
+  acNatural            Int?
+  acDeflection         Int?
+  acMisc               Int?
+  acDexterityAvailable Boolean?
+  acDexterityMax       Int?
+  skillPenalty         Int?
+  attackMelee          Int?
+  attackRanged         Int?
+  attackTouch          Int?
+  attackGrapple        Int?
+  damageMelee          Int?
+  damageRanged         Int?
+  hpTemp               Int?
+  resistSpell          Int?
+  resistPsionic        Int?
+  resistAcid           Int?
+  resistCold           Int?
+  resistElectricity    Int?
+  resistFire           Int?
+  resistSonic          Int?
+  resistForce          Int?
+  resistNegativeEnergy Int?
+  resistPositiveEnergy Int?
+  resistPoison         Int?
+  resistDisease        Int?
+  resistDeathEffect    Int?
+  resistBlunt          Int?
+  resistPiercing       Int?
+  resistSlashing       Int?
+  resistGood           Int?
+  resistEvil           Int?
+  resistLawful         Int?
+  resistChaotic        Int?
   relatedRaces         CharacterRace[]
   relatedFeats         Feat[]
 }
 
+model Language {
+  id          Int    @id @default(autoincrement())
+  name        String @unique
+  description String
+  source      String
+
+  relatedRaces      RaceOnLanguage[]
+  relatedCharacters CharacterLanguages[]
+
+  @@index([name])
+}
+
 model Character {
-  id               Int                 @id @default(autoincrement())
-  name             String
-  player           String
-  alignment        String
-  age              Int
-  gender           String
-  background       String
-  hp               CharacterHp?
-  abilities        CharacterAbilities?
-  saves            CharacterSave?
-  skills           CharacterSkill[]
-  characterClasses CharacterOnClass[]
-  characterRaces   CharacterOnRace[] // halfblood, multiclass, etc.
+  id                 Int                 @id @default(autoincrement())
+  name               String
+  player             String // TODO: should player ID
+  alignment          String
+  age                Int
+  gender             String
+  background         String
+  hp                 CharacterHp?
+  abilities          CharacterAbilities?
+  saves              CharacterSave?
+  skills             CharacterSkill[]
+  characterClasses   CharacterOnClass[]
+  characterRaces     CharacterOnRace[] // halfblood, multiclass, etc.
+  characterLanguages CharacterLanguages?
+}
+
+model CharacterLanguages {
+  language    Language  @relation(fields: [languageId], references: [id], onDelete: Cascade)
+  languageId  Int
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  characterId Int       @unique
+
+  @@index([languageId, characterId])
 }
 
 model CharacterHp {
@@ -91,22 +112,22 @@ model CharacterHp {
   current     Int
   temp        Int
   nonlethal   Int
-  character   Character @relation(fields: [characterId], references: [id])
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
   characterId Int       @unique
 
   @@index([characterId])
 }
 
 model CharacterAbilities {
-  id           Int       @id @default(autoincrement())
-  strength     Int
-  dexterity    Int
-  constitution Int
-  intelligence Int
-  wisdom       Int
-  charisma     Int
-  character    Character @relation(fields: [characterId], references: [id])
-  characterId  Int       @unique
+  id          Int       @id @default(autoincrement())
+  str         Int
+  dex         Int
+  con         Int
+  int         Int
+  wis         Int
+  cha         Int
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  characterId Int       @unique
 
   @@index([characterId])
 }
@@ -116,51 +137,88 @@ model CharacterSave {
   fortitude   Int
   reflex      Int
   will        Int
-  character   Character @relation(fields: [characterId], references: [id])
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
   characterId Int       @unique
 
   @@index([characterId])
 }
 
 model CharacterOnRace {
-  character       Character     @relation(fields: [characterId], references: [id])
+  character       Character     @relation(fields: [characterId], references: [id], onDelete: Cascade)
   characterId     Int
-  characterRace   CharacterRace @relation(fields: [characterRaceId], references: [id])
+  characterRace   CharacterRace @relation(fields: [characterRaceId], references: [id], onDelete: Cascade)
   characterRaceId Int
 
   @@id([characterId, characterRaceId])
 }
 
 model CharacterRace {
-  id                       Int               @id @default(autoincrement())
-  name                     String
-  description              String
-  speed                    Int
-  size                     String
-  stats                    StatsBase         @relation(fields: [statsId], references: [id])
-  statsId                  Int
-  CharacterRaceOnCharacter CharacterOnRace[]
+  id                    Int                @id @default(autoincrement())
+  name                  String             @unique
+  description           String
+  descriptionShort      String
+  source                String
+  speed                 Int
+  size                  String
+  skillPointsFist       Int?
+  skillPointsAfterFirst Int?
+  skillBonuses          RaceOnSkillBonus[]
+  stats                 StatsBase?         @relation(fields: [statsId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  statsId               Int?
+  languages             RaceOnLanguage[]
+  relatedCharacters     CharacterOnRace[]
+  relatedFeats          RaceOnFeat[]
 }
 
-model ClassLvlBonuses {
-  id               Int                @id @default(autoincrement())
-  characterClass   CharacterClass     @relation(fields: [characterClassId], references: [id])
+model RaceOnSkillBonus {
+  characterRace   CharacterRace @relation(fields: [characterRaceId], references: [id])
+  characterRaceId Int
+  skill           SkillBase     @relation(fields: [skillId], references: [id])
+  skillId         Int
+  bonus           Int
+
+  @@id([characterRaceId, skillId])
+}
+
+model RaceOnLanguage {
+  language        Language      @relation(fields: [languageId], references: [id])
+  languageId      Int
+  isAutomatic     Boolean
+  characterRace   CharacterRace @relation(fields: [characterRaceId], references: [id])
+  characterRaceId Int
+
+  @@id([characterRaceId, languageId])
+}
+
+model RaceOnFeat {
+  feat            Feat          @relation(fields: [featId], references: [id])
+  featId          Int
+  characterRace   CharacterRace @relation(fields: [characterRaceId], references: [id])
+  characterRaceId Int
+
+  @@id([characterRaceId, featId])
+}
+
+model ClassLvlBonus {
+  id               Int                      @id @default(autoincrement())
+  characterClass   CharacterClass           @relation(fields: [characterClassId], references: [id], onDelete: Cascade)
   characterClassId Int
   level            Int
   baseAttack       Int
   fortitude        Int
   reflex           Int
   will             Int
-  spellPoints      Int
+  spellPoints      Int?
   spellsPerDay     ClassSpellPerDay[]
   spellsKnown      ClassSpellKnown[]
+  bonusFeats       FeatsOnClassLevelBonus[]
 
   @@index([characterClassId])
 }
 
 model ClassSpellKnown {
-  id            Int             @id @default(autoincrement())
-  classLevel    ClassLvlBonuses @relation(fields: [classLevelId], references: [id])
+  id            Int           @id @default(autoincrement())
+  classLevel    ClassLvlBonus @relation(fields: [classLevelId], references: [id], onDelete: Cascade)
   classLevelId  Int
   spellLevel    Int
   knownPerLevel Int
@@ -169,8 +227,8 @@ model ClassSpellKnown {
 }
 
 model ClassSpellPerDay {
-  id           Int             @id @default(autoincrement())
-  classLevel   ClassLvlBonuses @relation(fields: [classLevelId], references: [id])
+  id           Int           @id @default(autoincrement())
+  classLevel   ClassLvlBonus @relation(fields: [classLevelId], references: [id], onDelete: Cascade)
   classLevelId Int
   spellLevel   Int
   perDay       Int
@@ -179,36 +237,35 @@ model ClassSpellPerDay {
 }
 
 model CharacterOnClass {
-  character        Character      @relation(fields: [characterId], references: [id])
+  character        Character      @relation(fields: [characterId], references: [id], onDelete: Cascade)
   characterId      Int
-  characterClass   CharacterClass @relation(fields: [characterClassId], references: [id])
+  characterClass   CharacterClass @relation(fields: [characterClassId], references: [id], onDelete: Cascade)
   characterClassId Int
+  level            Int
 
   @@id([characterId, characterClassId])
 }
 
 model CharacterClass {
-  id                    Int                     @id @default(autoincrement())
-  name                  String
-  level                 Int
-  hitDice               Int
-  baseAttack            Int
-  fortitude             Int
-  reflex                Int
-  will                  Int
-  skills                Int
-  skillPointsFist       Int
-  skillPointsAfterFirst Int
-  description           String
-  classLevelBonuses     ClassLvlBonuses[]
-  classSkills           CharacterClassOnSkill[]
-  CharacterOnClass      CharacterOnClass[] // ← all characters that have this class
+  id                      Int                     @id @default(autoincrement())
+  name                    String                  @unique
+  description             String
+  descriptionShort        String
+  source                  String
+  hitDice                 Int
+  skillPointsFist         Int
+  skillPointsAfterFirst   Int
+  baseAttribute           String
+  classLevelBonuses       ClassLvlBonus[] // ← all class level bonuses PER LEVEL, like base attack, saves, spell points, etc.
+  classSkills             CharacterClassOnSkill[] // ← simple relation to skills that could maximize 
+  relatedCharacters       CharacterOnClass[] // ← all characters that have this class
+  relatedFeatRequirements FeatRequirement[]
 }
 
 model CharacterClassOnSkill {
-  characterClass   CharacterClass @relation(fields: [characterClassId], references: [id])
+  characterClass   CharacterClass @relation(fields: [characterClassId], references: [id], onDelete: Cascade)
   characterClassId Int
-  skill            SkillBase      @relation(fields: [skillId], references: [id])
+  skill            SkillBase      @relation(fields: [skillId], references: [id], onDelete: Cascade)
   skillId          Int
 
   @@id([characterClassId, skillId])
@@ -216,32 +273,25 @@ model CharacterClassOnSkill {
 
 model SkillBase {
   id                     Int                      @id @default(autoincrement())
-  name                   String
+  name                   String                   @unique
   description            String
+  descriptionShort       String
+  source                 String
   ability                String
   trainedOnly            Boolean
   armorCheckPenalty      Int
   characterSkills        CharacterSkill[] // ← all characters that have this skill
-  skillBonus             SkillBonus[]
   FeatRequirementOnSkill FeatRequirementOnSkill[]
+  FeatsOnSkillBonus      FeatsOnSkillBonus[]
   CharacterClassOnSkill  CharacterClassOnSkill[]
-}
-
-model SkillBonus {
-  id           Int                 @id @default(autoincrement())
-  skill        SkillBase           @relation(fields: [skillId], references: [id])
-  skillId      Int
-  bonus        Int
-  relatedFeats FeatsOnSkillBonus[]
-
-  @@index([skillId])
+  RaceOnSkillBonus       RaceOnSkillBonus[]
 }
 
 model CharacterSkill {
   id          Int       @id @default(autoincrement())
-  character   Character @relation(fields: [characterId], references: [id])
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
   characterId Int
-  skill       SkillBase @relation(fields: [skillId], references: [id])
+  skill       SkillBase @relation(fields: [skillId], references: [id], onDelete: Cascade)
   skillId     Int
   ranks       Int
 
@@ -249,40 +299,63 @@ model CharacterSkill {
 }
 
 model Feat {
-  id                    Int                     @id @default(autoincrement())
-  name                  String
-  description           String
-  type                  String
-  isPassive             Boolean
-  isFighterBonusFeat    Boolean
-  stats                 StatsBase?              @relation(fields: [statsId], references: [id])
-  statsId               Int?
-  skillsBonuses         FeatsOnSkillBonus[]
-  requirements          FeatRequirement[]
-  FeatRequirementOnFeat FeatRequirementOnFeat[]
+  id                     Int                      @id @default(autoincrement())
+  name                   String                   @unique
+  description            String
+  descriptionShort       String
+  source                 String
+  type                   String
+  isPassive              Boolean
+  isFighterBonusFeat     Boolean
+  isStackable            Boolean
+  stats                  StatsBase?               @relation(fields: [statsId], references: [id])
+  statsId                Int?
+  skillBonuses           FeatsOnSkillBonus[]
+  requirements           FeatRequirement[]
+  // not important
+  relatedFeatRequirement FeatRequirementOnFeat[]
+  relatedClassLevelBonus FeatsOnClassLevelBonus[]
+  relatedRaces           RaceOnFeat[]
+}
+
+model FeatsOnClassLevelBonus {
+  feat              Feat          @relation(fields: [featId], references: [id])
+  featId            Int
+  classLevelBonus   ClassLvlBonus @relation(fields: [classLevelBonusId], references: [id])
+  classLevelBonusId Int
+
+  @@id([featId, classLevelBonusId])
 }
 
 model FeatsOnSkillBonus {
-  feat         Feat       @relation(fields: [featId], references: [id])
-  featId       Int
-  skillBonus   SkillBonus @relation(fields: [skillBonusId], references: [id])
-  skillBonusId Int
+  feat    Feat      @relation(fields: [featId], references: [id])
+  featId  Int
+  skill   SkillBase @relation(fields: [skillId], references: [id])
+  skillId Int
+  bonus   Int
 
-  @@id([featId, skillBonusId])
+  @@id([featId, skillId])
 }
 
 model FeatRequirement {
-  id                   Int                      @id @default(autoincrement())
-  feat                 Feat                     @relation(fields: [featId], references: [id])
-  featId               Int
-  requiredStrength     Int?
-  requiredDexterity    Int?
-  requiredConstitution Int?
-  requiredIntelligence Int?
-  requiredWisdom       Int?
-  requiredCharisma     Int?
-  requiredSkills       FeatRequirementOnSkill[]
-  requiredFeats        FeatRequirementOnFeat[]
+  id            Int                      @id @default(autoincrement())
+  feat          Feat                     @relation(fields: [featId], references: [id])
+  featId        Int
+  str           Int?
+  dex           Int?
+  con           Int?
+  int           Int?
+  wis           Int?
+  cha           Int?
+  minBaseAttack Int?
+  other         String?
+  casterOnly    Boolean?
+  divineOnly    Boolean?
+  minClassLevel Int?
+  class         CharacterClass?          @relation(fields: [classId], references: [id])
+  classId       Int?
+  skills        FeatRequirementOnSkill[]
+  feats         FeatRequirementOnFeat[]
 
   @@index([featId])
 }
