@@ -10,10 +10,6 @@ export interface ReqBodyRace {
   statsId?: number;
   skillPointsFist?: number;
   skillPointsAfterFirst?: number;
-  skillBonuses?: {
-    skillId: number;
-    bonus: number;
-  }[];
   languages?: {
     languageId: number;
     isAutomatic?: boolean; // if true, the character knows this language without needing to spend skill points
@@ -26,7 +22,7 @@ export interface ReqBodyRace {
   // }[]
 }
 
-export interface ReqBodyLangue {
+export interface ReqBodyLanguage {
   id?: number;
   name: string;
   description?: string;

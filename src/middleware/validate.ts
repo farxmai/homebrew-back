@@ -1,4 +1,4 @@
-import { ZodSchema, ZodError } from "zod";
+import { ZodSchema, ZodError } from "zod/v4";
 import { Request, Response, NextFunction, RequestHandler } from "express";
 
 export const validateBody =
@@ -11,7 +11,7 @@ export const validateBody =
       if (err instanceof ZodError) {
         res.status(400).json({
           error: "Validation failed",
-          details: err.errors,
+          details: err,
         });
         return;
       }

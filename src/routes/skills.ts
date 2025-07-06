@@ -15,7 +15,7 @@ const router = Router({ mergeParams: true });
 
 router.get("/", getSkills);
 router.get("/:id", checkId, getSkillById);
-router.post("/", createSkill, validateBody(skillSchema));
+router.post("/", validateBody(skillSchema), createSkill);
 router.put("/:id", checkId, validateBody(skillSchema), updateSkill);
 router.delete("/:id", checkId, deleteSkill);
 

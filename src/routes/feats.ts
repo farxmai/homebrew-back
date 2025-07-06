@@ -15,7 +15,7 @@ const router = Router({ mergeParams: true });
 
 router.get("/", getFeats);
 router.get("/:id", checkId, getFeatById);
-router.post("/", createFeat, validateBody(featSchema));
+router.post("/", validateBody(featSchema), createFeat);
 router.put("/:id", checkId, validateBody(featSchema), updateFeat);
 router.delete("/:id", checkId, deleteFeat);
 

@@ -15,7 +15,7 @@ const router = Router({ mergeParams: true });
 
 router.get("/", getRaces);
 router.get("/:id", checkId, getRaceById);
-router.post("/", createRace, validateBody(raceSchema));
+router.post("/", validateBody(raceSchema), createRace);
 router.put("/:id", checkId, validateBody(raceSchema), updateRace);
 router.delete("/:id", checkId, deleteRace);
 

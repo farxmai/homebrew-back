@@ -1,4 +1,5 @@
-import { z } from "zod";
+import { z } from "zod/v4";
+import { statBaseSchema } from "./statBaseSchemas";
 
 export const raceSchema = z.object({
   name: z.string().min(1),
@@ -9,14 +10,7 @@ export const raceSchema = z.object({
   size: z.number().min(1).default(0),
   skillPointsFistLevel: z.number().int().optional(),
   skillPointsAfterFirstLevel: z.number().int().optional(),
-  skillBonuses: z
-    .array(
-      z.object({
-        skillId: z.number().int(),
-        bonus: z.number().int(),
-      })
-    )
-    .optional(),
+  stats: statBaseSchema.optional(),
   languages: z
     .array(
       z.object({
