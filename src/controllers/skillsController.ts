@@ -8,7 +8,20 @@ export const getSkills = async (
   next: NextFunction
 ) => {
   try {
-    const skills = await prisma.skillBase.findMany();
+    const skills = await prisma.skillBase.findMany({
+      orderBy: { name: "asc" },
+      select: {
+        id: true,
+        translations: {
+          select: {
+            id: true,
+            locale: true,
+            name: true,
+            descriptionShort: true,
+          },
+        },
+      },
+    });
     res.json(skills);
   } catch (error) {
     console.error("Error fetching skills:", error);
@@ -28,11 +41,11 @@ export const getSkillById = async (
   try {
     const skill = await prisma.skillBase.findUnique({
       where: { id: skillId },
+      include: { translations: true },
     });
     if (!skill) {
       return res.status(404).json({ error: "Skill not found" });
     }
-    res.json(skill);
   } catch (error) {
     console.error("Error fetching skill:", error);
     next(error);
@@ -46,7 +59,7 @@ export const createSkill = async (
 ) => {
   try {
     const skillData = req.body as ReqBodySkill;
-    const characters = await prisma.skillBase.create({
+    const skill = await prisma.skillBase.create({
       data: {
         name: skillData.name,
         ability: skillData.ability,
@@ -55,9 +68,17 @@ export const createSkill = async (
         descriptionShort: skillData.descriptionShort || "",
         trainedOnly: skillData.trainedOnly || false,
         armorCheckPenalty: skillData.armorCheckPenalty || 0,
+        translations: {
+          create: skillData.translations.map((translation) => ({
+            locale: translation.locale,
+            name: translation.name,
+            description: translation.description || "",
+            descriptionShort: translation.descriptionShort || "",
+          })),
+        },
       },
     });
-    res.json(characters);
+    res.json(skill);
   } catch (error) {
     console.error("Error creating skill:", error);
     next(error);
@@ -77,7 +98,35 @@ export const updateSkill = async (
     const skillData = req.body as ReqBodySkill;
     const updatedSkill = await prisma.skillBase.update({
       where: { id: skillId },
-      data: skillData,
+      include: { translations: true },
+      data: {
+        name: skillData.name,
+        ability: skillData.ability,
+        source: skillData.source || "Players Handbook 1",
+        description: skillData.description || "",
+        descriptionShort: skillData.descriptionShort || "",
+        trainedOnly: skillData.trainedOnly || false,
+        armorCheckPenalty: skillData.armorCheckPenalty || 0,
+        translations: {
+          upsert: skillData.translations.map((translation) => ({
+            where: {
+              id: translation.id || 0, // Use a default value that won't match for new records
+            },
+            update: {
+              locale: translation.locale,
+              name: translation.name,
+              description: translation.description || "",
+              descriptionShort: translation.descriptionShort || "",
+            },
+            create: {
+              locale: translation.locale,
+              name: translation.name,
+              description: translation.description || "",
+              descriptionShort: translation.descriptionShort || "",
+            },
+          })),
+        },
+      },
     });
     res.json(updatedSkill);
   } catch (error) {

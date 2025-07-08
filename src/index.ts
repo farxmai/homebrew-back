@@ -1,5 +1,6 @@
 import express, { Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
+import cors from "cors";
 import swaggerUi from "swagger-ui-express";
 import swaggerJsdoc from "swagger-jsdoc";
 import { swaggerOptions } from "./swagger";
@@ -10,6 +11,7 @@ import skillsRouter from "./routes/skills";
 import classesRouter from "./routes/classes";
 import featsRouter from "./routes/feats";
 import racesRouter from "./routes/races";
+import { getLanguage } from "./middleware/getLanguage";
 
 // Load environment variables from .env
 dotenv.config();
@@ -18,6 +20,7 @@ const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
 const app = express();
 // Middleware
+app.use(cors());
 app.use(express.json());
 
 // Root endpoint
@@ -28,6 +31,8 @@ app.get("/", (_req: Request, res: Response<HealthCheck>) => {
 
 // API routes
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+app.use(getLanguage);
 app.use("/characters", charactersRouter);
 app.use("/skills", skillsRouter);
 app.use("/classes", classesRouter);

@@ -3,6 +3,13 @@ export interface ReqBodyRace {
   name: string;
   description: string;
   descriptionShort?: string;
+  translations: {
+    id?: number; // optional for updates
+    locale: string; // e.g., "en", "fr", "de"
+    name: string; // locale: name
+    description?: string; // locale: description
+    descriptionShort?: string; // locale: descriptionShort
+  }[];
   source?: string;
   speed: number;
   size: number;
@@ -34,6 +41,13 @@ export interface ReqBodyClass {
   name: string;
   description: string;
   descriptionShort?: string;
+  translations: {
+    id?: number; // optional for updates
+    locale: string; // e.g., "en", "fr", "de"
+    name: string; // locale: name
+    description?: string; // locale: description
+    descriptionShort?: string; // locale: descriptionShort
+  }[];
   source?: string;
   hitDice: number;
   skillPointsFist: number;
@@ -91,6 +105,14 @@ export interface ReqBodyFeat {
   name: string;
   description: string;
   descriptionShort?: string;
+  translations: {
+    id?: number; // optional for updates
+    locale: string; // e.g., "en", "fr", "de"
+    name: string; // locale: name
+    description?: string; // locale: description
+    descriptionShort?: string; // locale: descriptionShort
+    requirementOther?: string; // e.g., "Requires a specific class level"
+  }[];
   source?: string;
   type: string;
   isPassive?: boolean;
@@ -99,6 +121,7 @@ export interface ReqBodyFeat {
   stats?: ReqBodyStatsBase;
   statsId?: number;
   requirement?: ReqBodyRequirement;
+  requirementOther?: string; // e.g., "Requires a specific class level"
 }
 
 export interface ReqBodySkill {
@@ -108,6 +131,13 @@ export interface ReqBodySkill {
   source?: string;
   description?: string;
   descriptionShort?: string;
+  translations: {
+    id?: number; // optional for updates
+    locale: string; // e.g., "en", "fr", "de"
+    name: string; // locale: name
+    description?: string; // locale: description
+    descriptionShort?: string; // locale: descriptionShort
+  }[];
   trainedOnly?: boolean;
   armorCheckPenalty?: number;
 }

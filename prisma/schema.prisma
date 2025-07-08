@@ -180,14 +180,14 @@ model CharacterOnRace {
 }
 
 model CharacterRace {
-  id                    Int               @id @default(autoincrement())
-  name                  String            @unique
+  id                    Int                        @id @default(autoincrement())
+  name                  String                     @unique
   description           String
   descriptionShort      String
   source                String
   speed                 Int
   size                  Int
-  stats                 StatsBase?        @relation(fields: [statsId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  stats                 StatsBase?                 @relation(fields: [statsId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   statsId               Int?
   skillPointsFist       Int?
   skillPointsAfterFirst Int?
@@ -195,6 +195,19 @@ model CharacterRace {
   feats                 RaceOnFeat[]
   // not important
   relatedCharacters     CharacterOnRace[]
+  translations          CharacterRaceTranslation[]
+}
+
+model CharacterRaceTranslation {
+  id               Int           @id @default(autoincrement())
+  characterRace    CharacterRace @relation(fields: [characterRaceId], references: [id], onDelete: Cascade)
+  characterRaceId  Int
+  locale           String
+  name             String
+  description      String
+  descriptionShort String
+
+  @@index([characterRaceId])
 }
 
 model RaceOnLanguage {
@@ -264,8 +277,8 @@ model CharacterOnClass {
 }
 
 model CharacterClass {
-  id                    Int                     @id @default(autoincrement())
-  name                  String                  @unique
+  id                    Int                         @id @default(autoincrement())
+  name                  String                      @unique
   description           String
   descriptionShort      String
   source                String
@@ -277,6 +290,19 @@ model CharacterClass {
   classSkills           CharacterClassOnSkill[] // ← simple relation to skills that could maximize 
   relatedCharacters     CharacterOnClass[] // ← all characters that have this class
   relatedRequirements   Requirement[]
+  translations          CharacterClassTranslation[]
+}
+
+model CharacterClassTranslation {
+  id               Int            @id @default(autoincrement())
+  characterClass   CharacterClass @relation(fields: [characterClassId], references: [id], onDelete: Cascade)
+  characterClassId Int
+  locale           String
+  name             String
+  description      String
+  descriptionShort String
+
+  @@index([characterClassId])
 }
 
 model CharacterClassOnSkill {
@@ -303,6 +329,19 @@ model SkillBase {
   relatedRequirements RequirementOnSkill[]
   relateClasses       CharacterClassOnSkill[]
   relateSkillBonuses  SkillBonusOnStatsBase[]
+  translations        SkillBaseTranslation[]
+}
+
+model SkillBaseTranslation {
+  id               Int       @id @default(autoincrement())
+  skill            SkillBase @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  skillId          Int
+  locale           String
+  name             String
+  description      String
+  descriptionShort String
+
+  @@index([skillId])
 }
 
 model CharacterSkill {
@@ -330,11 +369,26 @@ model Feat {
   statsId                Int?
   requirement            Requirement?             @relation(fields: [featRequirementId], references: [id])
   requirementId          Int?
+  requirementDescription String? // description of the requirement, if any
   // not important
   relatedRequirement     RequirementOnFeat[]
   relatedClassLevelBonus FeatsOnClassLevelBonus[]
   relatedRaces           RaceOnFeat[]
   featRequirementId      Int?
+  translations           FeatTranslation[]
+}
+
+model FeatTranslation {
+  id                     Int     @id @default(autoincrement())
+  feat                   Feat    @relation(fields: [featId], references: [id], onDelete: Cascade)
+  featId                 Int
+  locale                 String
+  name                   String
+  description            String
+  descriptionShort       String
+  requirementDescription String? // description of the requirement, if any
+
+  @@index([featId])
 }
 
 model FeatsOnClassLevelBonus {
@@ -356,7 +410,6 @@ model Requirement {
   wis           Int?
   cha           Int?
   minBaseAttack Int?
-  other         String?
   casterOnly    Boolean?
   divineOnly    Boolean?
   minClassLevel Int?
